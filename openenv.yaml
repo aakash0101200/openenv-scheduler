@@ -1,0 +1,8 @@
+name: dynamic-rescheduling-assistant
+version: 0.1.0
+description: An environment where an AI agent reschedules classes and handles campus conflicts.
+environment:
+  entrypoint: scheduler_env:SchedulerEnv
+tasks:
+  - name: easy_room_reallocation
+    description: Reallocate a class from a broken room to an empty room.
