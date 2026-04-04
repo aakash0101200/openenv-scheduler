@@ -5,4 +5,8 @@ environment:
   entrypoint: scheduler_env:SchedulerEnv
 tasks:
   - name: easy_room_reallocation
-    description: Reallocate a class from a broken room to an empty room.
+    description: "Task 1 (Easy): Room 101 is broken. Move CS101 to an empty room at 10:00 AM, then SUBMIT_TASK."
+  - name: medium_professor_sick_leave
+    description: "Task 2 (Medium): Prof. Smith is sick. Cancel all their classes, notify students for each, then SUBMIT_TASK."
+  - name: hard_cascading_conflict
+    description: "Task 3 (Hard): The Auditorium is double-booked. Move PHY301 to a free room, notify affected students, then SUBMIT_TASK."
