@@ -1,17 +1,7 @@
 ---
 AI agent resolves university scheduling conflicts via OpenEnv
 ---
-
-# 🎓 Dynamic Campus Scheduling Environment
-
-> **OpenEnv Hackathon Round 1 — Real-World AI Environment**
-> An AI agent acts as an emergency university registrar, resolving room conflicts,
-> professor sick leave, and cascading scheduling crises in real time.
-
-[![OpenEnv](https://img.shields.io/badge/OpenEnv--core-0.2.3-brightgreen)](https://pypi.org/project/openenv-core/)
-[![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](https://python.org)
-[![HF Space](https://img.shields.io/badge/HF%20Space-Live-yellow)](https://huggingface.co/spaces/sky001000/campus-scheduler)
-
+---
 ---
 
 ## 🧭 Problem Statement
