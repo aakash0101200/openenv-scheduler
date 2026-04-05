@@ -1,14 +1,31 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
-name = "dynamic-rescheduling-assistant"
-version = "0.1.0"
-description = "An environment where an AI agent reschedules classes and handles campus conflicts."
+name = "campus-scheduler-env"
+version = "1.0.0"
+description = "Dynamic Campus Scheduling Environment for OpenEnv — an AI agent resolves real-world university scheduling conflicts"
+requires-python = ">=3.10"
 dependencies = [
-    "openenv",
-    "pydantic",
-    "fastapi",
-    "uvicorn",
-    "openai"
+    # openenv-core provides: Environment, Action, Observation, State, create_app
+    # [core] installs the server extras: fastapi, uvicorn, websockets, etc.
+    "openenv-core[core]>=0.2.2",
+    "pydantic>=2.0.0",
+    # openai client used in inference.py to call HF Inference API
+    "openai>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "httpx>=0.25.0",   # needed by FastAPI test client
 ]
 
 [project.scripts]
+# Enables: python -m uvicorn server.app:app  OR  uv run server
 server = "server.app:main"
+
+[tool.setuptools]
+include-package-data = true
+packages = ["server"]

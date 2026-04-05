@@ -1,12 +1,31 @@
-name: dynamic-rescheduling-assistant
-version: 0.1.0
-description: An environment where an AI agent reschedules classes and handles campus conflicts.
+name: campus-scheduler
+version: "1.0.0"
+description: >
+  Dynamic Campus Scheduling Environment — an AI agent acts as an emergency
+  university registrar, resolving room conflicts, professor sick leave, and
+  cascading scheduling crises using a structured action space.
+
 environment:
-  entrypoint: scheduler_env:SchedulerEnv
+  entrypoint: server.campus_environment:CampusEnvironment
+
 tasks:
   - name: easy_room_reallocation
-    description: "Task 1 (Easy): Room 101 is broken. Move CS101 to an empty room at 10:00 AM, then SUBMIT_TASK."
+    description: >
+      Task 1 (Easy): Room 101 is under maintenance. Move CS101 to a free
+      room at 10:00 AM without creating any double-bookings. Call SUBMIT_TASK
+      when done.
+    task_level: 1
+
   - name: medium_professor_sick_leave
-    description: "Task 2 (Medium): Prof. Smith is sick. Cancel all their classes, notify students for each, then SUBMIT_TASK."
+    description: >
+      Task 2 (Medium): Prof. Smith has an emergency. Cancel ALL of their
+      classes (CS101 and MATH201) and notify the enrolled students for each.
+      Call SUBMIT_TASK when done.
+    task_level: 2
+
   - name: hard_cascading_conflict
-    description: "Task 3 (Hard): The Auditorium is double-booked. Move PHY301 to a free room, notify affected students, then SUBMIT_TASK."
+    description: >
+      Task 3 (Hard): The Auditorium has a double-booking conflict. Move
+      PHY301 to a free room at a new time slot (not 2:00 PM), notify the
+      affected students, and call SUBMIT_TASK when done.
+    task_level: 3

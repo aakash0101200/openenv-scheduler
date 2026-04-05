@@ -1,31 +1,52 @@
-import uvicorn
-from fastapi import FastAPI
-from scheduler_env import SchedulerEnv
-from env_models import Action
+"""
+FastAPI application for the Campus Scheduler Environment.
 
-app = FastAPI(title="Dynamic Rescheduling Assistant API")
-env = SchedulerEnv()
+WHY one line?
+    openenv-core's create_app() automatically generates ALL the HTTP and
+    WebSocket endpoints you need:
+        GET  /health     → judges ping this to confirm the Space is live
+        POST /reset      → start a new episode
+        POST /step       → send an action, get an observation + reward
+        GET  /state      → get current episode metadata
+        GET  /docs       → interactive Swagger UI (auto-generated)
+        GET  /web        → built-in browser UI for manual testing
 
-@app.post("/reset")
-def reset():
-    return env.reset()
+    You do NOT write these routes yourself — the framework handles it.
 
-@app.get("/state")
-def state():
-    return env.state()
+Usage (local dev):
+    uvicorn server.app:app --reload --host 0.0.0.0 --port 8000
 
-@app.post("/step")
-def step(action: Action):
-    obs, reward, done, info = env.step(action)
-    return {
-        "observation": obs.model_dump(),
-        "reward": reward.model_dump(),
-        "done": done,
-        "info": info
-    }
+Usage (production / HF Space via Dockerfile):
+    uvicorn server.app:app --host 0.0.0.0 --port 8000
+"""
+
+import sys
+import os
+
+# Add the project root to path so server/ can import from root models.py
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from openenv.core.env_server import create_app
+
+from server.campus_environment import CampusEnvironment
+from models import CampusAction, CampusObservation
+
+# ── Create the FastAPI app ────────────────────────────────────────────────────
+# Pass the CLASS (not an instance) so the framework can create one session
+# per connected client (required when SUPPORTS_CONCURRENT_SESSIONS = True).
+app = create_app(
+    CampusEnvironment,
+    CampusAction,
+    CampusObservation,
+    env_name="campus_scheduler",
+)
+
 
 def main():
-    uvicorn.run("server.app:app", host="0.0.0.0", port=8000, reload=True)
+    """Entry point for: uv run server  (defined in pyproject.toml scripts)."""
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+
 
 if __name__ == "__main__":
     main()
