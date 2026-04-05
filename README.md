@@ -1,12 +1,5 @@
 ---
-title: Campus Scheduler — OpenEnv Environment
-emoji: 🎓
-colorFrom: indigo
-colorTo: purple
-sdk: docker
-pinned: false
-license: mit
-short_description: AI agent resolves university scheduling conflicts via OpenEnv
+AI agent resolves university scheduling conflicts via OpenEnv
 ---
 
 # 🎓 Dynamic Campus Scheduling Environment
