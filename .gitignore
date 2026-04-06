@@ -31,3 +31,4 @@ evals/
 *.txt
 *.bat
 !README.md
+!requirements.txt
