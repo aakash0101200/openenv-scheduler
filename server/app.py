@@ -41,6 +41,11 @@ app = create_app(
     env_name="campus_scheduler",
 )
 
+@app.get("/")
+def root():
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="/docs")
+
 
 def main():
     """Entry point for: uv run server  (defined in pyproject.toml scripts)."""
