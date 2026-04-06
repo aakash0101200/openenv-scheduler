@@ -26,6 +26,8 @@ from typing import Any, Optional
 
 from openenv.core.env_server import Environment
 
+import random
+
 # We import from models.py at the same level (root of the project)
 import sys
 import os
@@ -111,14 +113,14 @@ class CampusEnvironment(Environment):
         self,
         seed: Optional[int] = None,
         episode_id: Optional[str] = None,
-        task_level: int = 1,          # default task level
+        task_level: Optional[int] = None,   # default task level
         **kwargs: Any,
     ) -> CampusObservation:
         """
         Reinitialize the campus database and start a new episode.
         
         Args:
-            task_level: 1 = Easy, 2 = Medium, 3 = Hard. Defaults to 1.
+            task_level: 1 = Easy, 2 = Medium, 3 = Hard. Defaults to randomly selected if None.
         """
         # The OpenEnv Web UI passes the selected task from openenv.yaml under the "config" key
         config = kwargs.get("config", {})
@@ -133,6 +135,10 @@ class CampusEnvironment(Environment):
                     task_level = 3
                 elif "easy" in name:
                     task_level = 1
+                    
+        # If no explicit task was requested, pick a random task
+        if task_level is None:
+            task_level = random.randint(1, 3)
             
         self._init_db()
         self._task_level = max(1, min(3, int(task_level)))  # clamp to 1–3
