@@ -38,6 +38,9 @@ RUN if command -v uv > /dev/null 2>&1; then \
 # ── Set PYTHONPATH so imports from root (models.py etc.) resolve ─────────────
 ENV PYTHONPATH="/app:$PYTHONPATH"
 
+# ── Enable the interactive Gradio Web UI ──────────────────────────────────────
+ENV ENABLE_WEB_INTERFACE=true
+
 # ── Health check (judges use GET /health to confirm the Space is live) ────────
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:7860/health')" || exit 1
