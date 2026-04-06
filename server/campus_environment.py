@@ -122,8 +122,17 @@ class CampusEnvironment(Environment):
         """
         # The OpenEnv Web UI passes the selected task from openenv.yaml under the "config" key
         config = kwargs.get("config", {})
-        if isinstance(config, dict) and "task_level" in config:
-            task_level = config["task_level"]
+        if isinstance(config, dict):
+            if "task_level" in config:
+                task_level = config["task_level"]
+            elif "name" in config:
+                name = str(config["name"]).lower()
+                if "medium" in name:
+                    task_level = 2
+                elif "hard" in name:
+                    task_level = 3
+                elif "easy" in name:
+                    task_level = 1
             
         self._init_db()
         self._task_level = max(1, min(3, int(task_level)))  # clamp to 1–3
