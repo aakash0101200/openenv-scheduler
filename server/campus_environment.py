@@ -111,15 +111,20 @@ class CampusEnvironment(Environment):
         self,
         seed: Optional[int] = None,
         episode_id: Optional[str] = None,
-        task_level: int = 1,          # which task to run (1, 2, or 3)
+        task_level: int = 1,          # default task level
         **kwargs: Any,
     ) -> CampusObservation:
         """
         Reinitialize the campus database and start a new episode.
-
+        
         Args:
             task_level: 1 = Easy, 2 = Medium, 3 = Hard. Defaults to 1.
         """
+        # The OpenEnv Web UI passes the selected task from openenv.yaml under the "config" key
+        config = kwargs.get("config", {})
+        if isinstance(config, dict) and "task_level" in config:
+            task_level = config["task_level"]
+            
         self._init_db()
         self._task_level = max(1, min(3, int(task_level)))  # clamp to 1–3
         self._state = CampusState(
