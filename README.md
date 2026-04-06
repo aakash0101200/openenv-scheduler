@@ -6,7 +6,7 @@ colorTo: purple
 sdk: docker
 pinned: false
 license: mit
-short_description: AI agent resolves university scheduling conflicts via OpenEnv
+short_description: Resolves university scheduling
 ---
 
 # 🎓 Dynamic Campus Scheduling Environment
