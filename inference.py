@@ -39,7 +39,7 @@ from server.campus_environment import CampusEnvironment, TASKS
 
 # ── Environment variable setup ────────────────────────────────────────────────
 
-API_BASE_URL = os.getenv("API_BASE_URL", "https://api-inference.huggingface.co/v1/")
+API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/hf-inference/v1/")
 MODEL_NAME   = os.getenv("MODEL_NAME",   "meta-llama/Meta-Llama-3-8B-Instruct")
 HF_TOKEN     = os.getenv("HF_TOKEN",     "")
 
