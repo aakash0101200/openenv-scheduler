@@ -41,7 +41,7 @@ from server.campus_environment import CampusEnvironment, TASKS
 
 API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/hf-inference/v1/")
 MODEL_NAME   = os.getenv("MODEL_NAME",   "meta-llama/Meta-Llama-3-8B-Instruct")
-HF_TOKEN     = os.getenv("HF_TOKEN",     "")
+HF_TOKEN     = os.getenv("HF_TOKEN")
 
 # ── The system prompt sent to the LLM ────────────────────────────────────────
 
@@ -114,7 +114,7 @@ def run_task(env: CampusEnvironment, client: OpenAI, task_level: int) -> float:
       3. Returns the final reward when done=True
     """
     # ── MANDATORY LOG: START ──────────────────────────────────────────────
-    print(f"[START] Task {task_level}")
+    print(f"[START] task=task_{task_level} env=campus-scheduler model={MODEL_NAME}", flush=True)
 
     obs = env.reset(task_level=task_level)
 
@@ -130,6 +130,7 @@ def run_task(env: CampusEnvironment, client: OpenAI, task_level: int) -> float:
 
     final_score = 0.0
     max_steps = 12  # keep well under the 20-minute limit
+    rewards = []
 
     for step_num in range(1, max_steps + 1):
         # Get action from LLM
@@ -141,12 +142,15 @@ def run_task(env: CampusEnvironment, client: OpenAI, task_level: int) -> float:
         except Exception:
             action = CampusAction(action_type=ActionType.SUBMIT_TASK)
 
-        # ── MANDATORY LOG: STEP ───────────────────────────────────────────
-        params = {k: v for k, v in action_dict.items() if k != "action_type" and v is not None}
-        print(f"[STEP] Action: {action.action_type.value} | Params: {json.dumps(params)}")
-
         # Execute action in environment
         obs = env.step(action)
+        
+        reward = obs.reward if obs.reward is not None else 0.0
+        rewards.append(reward)
+        done = obs.done
+
+        # ── MANDATORY LOG: STEP ───────────────────────────────────────────
+        print(f"[STEP] step={step_num} action={action.action_type.value} reward={reward:.2f} done={str(done).lower()} error=null", flush=True)
 
         # Update conversation with environment feedback
         messages.append({
@@ -167,11 +171,13 @@ def run_task(env: CampusEnvironment, client: OpenAI, task_level: int) -> float:
         })
 
         if obs.done:
-            final_score = obs.reward if obs.reward is not None else 0.0
+            final_score = reward
             break
 
     # ── MANDATORY LOG: END ────────────────────────────────────────────────
-    print(f"[END] Final Score: {final_score}")
+    success = final_score >= 1.0
+    steps = len(rewards)
+    print(f"[END] success={str(success).lower()} steps={steps} score={final_score:.2f} rewards={','.join(f'{r:.2f}' for r in rewards)}", flush=True)
     return final_score
 
 
