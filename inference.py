@@ -183,12 +183,6 @@ def run_task(env: CampusEnvironment, client: OpenAI, task_level: int) -> float:
 
 def main():
     """Run all 3 task levels and report scores."""
-    # Validate environment variables
-    if not HF_TOKEN:
-        print("ERROR: HF_TOKEN environment variable is not set.", file=sys.stderr)
-        print("Set it with:  $env:HF_TOKEN='hf_...'", file=sys.stderr)
-        sys.exit(1)
-
     # Set up the OpenAI client pointing to HuggingFace Inference API
     client = OpenAI(
         api_key=HF_TOKEN,
