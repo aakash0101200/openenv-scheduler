@@ -87,6 +87,7 @@ def call_llm(client: OpenAI, messages: list[dict]) -> dict:
             messages=messages,
             max_tokens=150,
             temperature=0.1,   # low temp for deterministic JSON output
+            timeout=30.0,
         )
         content = response.choices[0].message.content.strip()
 
@@ -100,7 +101,7 @@ def call_llm(client: OpenAI, messages: list[dict]) -> dict:
 
     except Exception as e:
         print(f"  [WARN] LLM parse error: {e}. Falling back to submit_task.",
-              file=sys.stderr)
+              file=sys.stderr, flush=True)
         return {"action_type": "submit_task"}
 
 
@@ -176,8 +177,9 @@ def run_task(env: CampusEnvironment, client: OpenAI, task_level: int) -> float:
 
     # ── MANDATORY LOG: END ────────────────────────────────────────────────
     success = final_score >= 1.0
+    clamped_score = max(0.01, min(0.99, final_score))
     steps = len(rewards)
-    print(f"[END] success={str(success).lower()} steps={steps} score={final_score:.2f} rewards={','.join(f'{r:.2f}' for r in rewards)}", flush=True)
+    print(f"[END] success={str(success).lower()} steps={steps} score={clamped_score:.2f} rewards={','.join(f'{r:.2f}' for r in rewards)}", flush=True)
     return final_score
 
 
@@ -197,7 +199,7 @@ def main():
         score = run_task(env, client, level)
         total_score += score
 
-    print(f"\nTotal Score: {total_score:.1f} / 3.0")
+    print(f"\nTotal Score: {total_score:.1f} / 3.0", flush=True)
 
 
 if __name__ == "__main__":
