@@ -85,13 +85,34 @@ class CampusEnvironment(Environment):
 
     def _init_db(self):
         """Reset the campus database to its clean starting state."""
+        # --- PERIPHERAL RANDOMIZATION (Strategy: keep task anchors fixed) ---
+        # Anchor Subjects: CS101, MATH201, PHY301, Prof Smith, Prof Jones
+        # Anchor Rooms: 101, 102, Auditorium
+        
+        # Possible free rooms for relocation
+        relocation_options = ["103", "104", "105", "Lab A", "Lab B"]
+        random.shuffle(relocation_options)
+        
+        # Pick which room will be the "safe" empty room for Task 1
+        empty_room = relocation_options.pop()
+        
         # room_id → list of time slots that are currently booked
         self._rooms: dict = {
             "101":        ["10:00 AM"],   # CS101 is here (broken room)
             "102":        ["11:00 AM"],   # MATH201 is here
-            "103":        [],             # empty
+            empty_room:   [],             # THE empty room
             "Auditorium": ["2:00 PM"],    # PHY301 is here
         }
+        
+        # Add remaining dynamic rooms with random dummy classes
+        dummy_profs = ["Prof. Alara", "Prof. Kaelen", "Prof. Vance", "Prof. Zara"]
+        dummy_slots = ["9:00 AM", "12:00 PM", "1:00 PM", "3:00 PM"]
+        
+        for room in relocation_options:
+            if random.random() > 0.3: # 70% chance room has a dummy class
+                self._rooms[room] = [random.choice(dummy_slots)]
+            else:
+                self._rooms[room] = []
 
         # class_id → {prof, room, time, status, enrolled}
         self._classes: dict = {
@@ -99,6 +120,22 @@ class CampusEnvironment(Environment):
             "MATH201": {"prof": "Smith", "room": "102",        "time": "11:00 AM", "status": "active"},
             "PHY301":  {"prof": "Jones", "room": "Auditorium", "time": "2:00 PM",  "status": "active"},
         }
+        
+        # Fill rooms with the dummy classes
+        for rid, slots in self._rooms.items():
+            for slot in slots:
+                # Don't overwrite our anchor classes
+                if rid in ["101", "102", "Auditorium"] and slot in ["10:00 AM", "11:00 AM", "2:00 PM"]:
+                    continue
+                
+                # Generate a unique dummy class ID
+                dummy_id = f"DUM-{random.randint(100, 999)}"
+                self._classes[dummy_id] = {
+                    "prof": random.choice(dummy_profs),
+                    "room": rid,
+                    "time": slot,
+                    "status": "active"
+                }
 
         # Set of class_ids whose students have been notified
         self._notifications: set = set()

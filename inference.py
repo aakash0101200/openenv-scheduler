@@ -63,17 +63,16 @@ AVAILABLE ACTIONS (respond with exactly one JSON object per turn):
    {"action_type": "cancel_class", "class_id": "CS101"}
 
 5. Notify students about a class change:
-   {"action_type": "notify_students", "class_id": "CS101"}
-
-6. Submit your solution when done:
-   {"action_type": "submit_task"}
-
-RULES:
-- Always query before acting (find empty rooms before moving a class)
-- Never double-book a room at the same time
-- Respond with ONLY a valid JSON object, no explanation
-- Classes: CS101 (Smith, Room 101, 10:00 AM), MATH201 (Smith, Room 102, 11:00 AM), PHY301 (Jones, Auditorium, 2:00 PM)
-- Rooms: 101, 102, 103, Auditorium"""
+    {"action_type": "notify_students", "class_id": "CS101"}
+ 
+ 6. Submit your solution when done:
+   {"action_type": "submit_task", "thought": "Reasoning here..."}
+ 
+ 1. THOUGHT: You MUST always provide a 'thought' field with your reasoning.
+2. QUERY FIRST: Always find empty rooms or professor schedules before acting.
+3. NO CONFLICTS: Never double-book a room.
+4. RESPOND: Respond with ONLY a valid JSON object.
+5. DYNAMIC: Use the tools to find the current state of rooms/classes."""
 
 
 def call_llm(client: OpenAI, messages: list[dict]) -> dict:
@@ -130,7 +129,7 @@ def run_task(env: CampusEnvironment, client: OpenAI, task_level: int) -> float:
     ]
 
     final_score = 0.0
-    max_steps = 12  # keep well under the 20-minute limit
+    max_steps = 20  # increased limit for agentic recovery
     rewards = []
 
     for step_num in range(1, max_steps + 1):
@@ -141,7 +140,11 @@ def run_task(env: CampusEnvironment, client: OpenAI, task_level: int) -> float:
         try:
             action = CampusAction(**action_dict)
         except Exception:
-            action = CampusAction(action_type=ActionType.SUBMIT_TASK)
+            action = CampusAction(action_type=ActionType.SUBMIT_TASK, thought="Invalid action generated, submitting.")
+
+        # Log reasoning separately to keep [STEP] format strict for grader
+        if action.thought:
+            print(f"[REASONING] {action.thought}", flush=True)
 
         # Execute action in environment
         obs = env.step(action)

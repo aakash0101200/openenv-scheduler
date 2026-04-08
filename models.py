@@ -47,6 +47,7 @@ class CampusAction(Action):
       - submit_task       → (no extra fields needed)
     """
     action_type:  ActionType    = ActionType.SUBMIT_TASK
+    thought:      Optional[str] = None   # Agent reasoning before taking action
     class_id:     Optional[str] = None   # e.g. "CS101", "MATH201"
     room_id:      Optional[str] = None   # e.g. "102", "Auditorium"
     time_slot:    Optional[str] = None   # e.g. "10:00 AM", "2:00 PM"
